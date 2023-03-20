@@ -1,10 +1,10 @@
+import datetime
 import sys
 
-from pyspark import SparkContext, SparkConf
-from pyspark.sql import SQLContext
 import pyspark.sql.functions as F
+from pyspark import SparkConf, SparkContext
+from pyspark.sql import SQLContext
 from pyspark.sql.window import Window
-import datetime
 
 
 def main():
