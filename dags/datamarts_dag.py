@@ -18,23 +18,57 @@ dag = DAG("datamarts_dag", schedule_interval=None, default_args=default_args)
 
 
 t1 = SparkSubmitOperator(
-    task_id="calculate_datamarts",
+    task_id="calculate_users_datamart",
     dag=dag,
-    application="/lessons/datamarts_dag.py",
+    application="/lessons/users_datamart.py",
     conn_id="yarn_spark",
     application_args=[
         "2022-06-15",
         "30",
-        "/user/xeniakutse/data/events"
-        "/user/xeniakutse/data/geo_tz.csv"
-        "/user/xeniakutse/data/analytics/users_datamart"
-        "/user/xeniakutse/data/analytics/zones_datamart"
+        "/user/xeniakutse/data/events",
+        "/user/xeniakutse/data/geo_tz.csv",
+        "/user/xeniakutse/data/analytics/users_datamart",
+    ],
+    conf={"spark.driver.maxResultSize": "20g"},
+    num_executors=2,
+    executor_memory="4g",
+    executor_cores=2,
+)
+
+t2 = SparkSubmitOperator(
+    task_id="calculate_zones_datamart",
+    dag=dag,
+    application="/lessons/zones_datamart.py",
+    conn_id="yarn_spark",
+    application_args=[
+        "2022-06-15",
+        "30",
+        "/user/xeniakutse/data/events",
+        "/user/xeniakutse/data/geo_tz.csv",
+        "/user/xeniakutse/data/analytics/zones_datamart",
+    ],
+    conf={"spark.driver.maxResultSize": "20g"},
+    num_executors=2,
+    executor_memory="4g",
+    executor_cores=2,
+)
+
+t3 = SparkSubmitOperator(
+    task_id="calculate_recommendations_datamart",
+    dag=dag,
+    application="/lessons/recommendations_datamart.py",
+    conn_id="yarn_spark",
+    application_args=[
+        "2022-06-15",
+        "30",
+        "/user/xeniakutse/data/events",
+        "/user/xeniakutse/data/geo_tz.csv",
         "/user/xeniakutse/data/analytics/recommendations_datamart",
     ],
     conf={"spark.driver.maxResultSize": "20g"},
-    executor_cores=4,
+    num_executors=2,
     executor_memory="4g",
+    executor_cores=2,
 )
 
-
-t1
+t1 >> t2 >> t3
